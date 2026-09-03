@@ -44,11 +44,7 @@ module.exports = (req, res) => {
             config.needreg = "Y";
             config.switchlang = "Y";
             config.agreepolicy = "N";
-            config.aiurl = `http://aivocal.mzmjapp.com/?from=android&app_userid={userid}&lang=${language}&market=${market}`;
-            config.aititle = "AI 学唱歌";
-            if (language && language.includes("en")) {
-                config.aititle = "AI sing";
-            }
+
         } else if (market === 'huawei') {
             config.showgoogle = "N";
             config.showwechat = "Y";
@@ -58,8 +54,7 @@ module.exports = (req, res) => {
             config.agreepolicy = "Y";
             config.switchlang = "Y";
         } else if (market === 'samsung') {
-            config.aiurl = `http://aivocal.mzmjapp.com/?from=android&app_userid={userid}&lang=${language}&market=${market}`;
-            config.aititle = "AI 学唱歌";
+
             config.showprivacywin = 'N';
             config.showgoogle = "Y";
             config.showwechat = "Y";
@@ -70,11 +65,7 @@ module.exports = (req, res) => {
             config.agreepolicy = "N";
         }
 
-        // 5. 最终覆盖 (对应 PHP 代码末尾的两行)
-        // ⚠️ 注意：你的原始 PHP 代码在这里会无条件清空 aiurl 和 aititle
-        // 如果这是你期望的行为，请保留。如果不需要，请删除下面这两行。
-        config.aiurl = "";
-        config.aititle = "";
+
 
         // 6. 构建最终返回对象 (对应 PHP 的 $arr=array('config'=>$config))
         const responseObj = {
