@@ -4,21 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase 课程测试</title>
-    <!-- 1. 必须引入 Bootstrap CSS -->
+    <title>Resang 每日开嗓</title>
+    <!-- 1. 引入 Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            padding: 20px;
+            padding-top: 20px;
             background-color: #f8f9fa;
         }
 
         .card {
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -26,38 +27,40 @@
 <body>
 
     <div class="container">
-        <h1 class="mb-4 text-center">最新课程列表</h1>
+        <h1 class="mb-4 text-center"> 最新课程列表</h1>
 
-        <!-- 这里是放卡片的容器 -->
+        <!-- 课程卡片容器 -->
         <div id="course-list" class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col-12 text-center text-muted">正在加载数据...</div>
+            <div class="col-12 text-center text-muted py-5">正在加载数据...</div>
         </div>
     </div>
 
-    <!-- 2. 必须引入 Supabase JS SDK -->
+    <!-- 2. 引入 Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         // --- 配置区域 ---
         const SUPABASE_URL = 'https://teuhgretiiawyjtkuzkh.supabase.co';
-        // ⚠️ 请在这里粘贴你的 anon public key
+        // ️ 请在这里粘贴你的 anon public key
         const SUPABASE_KEY = 'sb_publishable_UkBUhGy2NFbVcKB-_8-C8g_L2FPvuxt';
         // ----------------
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 使用不同的变量名（sbClient），彻底避免 Identifier 'supabase' has already been declared 报错
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function loadCourses() {
             const listContainer = document.getElementById('course-list');
 
             try {
-                // 发起请求
-                const { data, error } = await supabase
+                // 发起请求获取 courses 表数据
+                const { data, error } = await sbClient
                     .from('courses')
-                    .select('*');
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
-                // 清空“正在加载...”
+                // 清空“正在加载...”提示
                 listContainer.innerHTML = '';
 
                 if (!data || data.length === 0) {
@@ -67,9 +70,7 @@
 
                 // 循环生成卡片
                 data.forEach(course => {
-                    // 处理价格显示
                     const priceTag = course.price > 0 ? `¥${course.price}` : '免费';
-                    // 处理图片（如果没有图片用占位图）
                     const imgUrl = course.cover_url || 'https://via.placeholder.com/300x200?text=No+Image';
 
                     const cardHtml = `
@@ -87,3 +88,19 @@
                         </div>
                     </div>
                 `;
+                    listContainer.innerHTML += cardHtml;
+                });
+
+            } catch (err) {
+                console.error('出错了:', err);
+                listContainer.innerHTML = `<div class="col-12 text-danger text-center">加载失败: ${err.message}</div>`;
+            }
+        }
+
+        // 页面加载完立即执行
+        loadCourses();
+    </script>
+
+</body>
+
+</html>
