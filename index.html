@@ -1,1 +1,60 @@
-hello
+<!-- 课程列表容器 -->
+<div class="container my-5">
+    <h2 class="mb-4">最新课程</h2>
+    <div id="course-list" class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- 课程卡片会由 JS 动态生成到这里 -->
+    </div>
+</div>
+<!-- 1. 引入 Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // 2. 初始化 Supabase 客户端 (请替换成你自己的信息)
+    const SUPABASE_URL = 'https://teuhgretiiawyjtkuzkh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_UkBUhGy2NFbVcKB-_8-C8g_L2FPvuxt';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 3. 获取并渲染课程数据的函数
+    async function loadCourses() {
+        const { data, error } = await supabase
+            .from('courses')
+            .select('*')
+            .order('created_at', { ascending: false }); // 按创建时间倒序
+
+        if (error) {
+            console.error('获取课程失败:', error);
+            return;
+        }
+
+        const courseList = document.getElementById('course-list');
+        courseList.innerHTML = ''; // 清空默认内容
+
+        if (data.length === 0) {
+            courseList.innerHTML = '<p class="text-muted">暂无课程数据</p>';
+            return;
+        }
+
+        // 遍历数据，生成 Bootstrap 卡片
+        data.forEach(course => {
+            const card = `
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="${course.cover_url || 'https://via.placeholder.com/300x200'}" class="card-img-top" alt="${course.title}">
+            <div class="card-body">
+              <h5 class="card-title">${course.title}</h5>
+              <p class="card-text text-muted">${course.description || '暂无简介'}</p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+              <span class="badge bg-primary fs-6">${course.price > 0 ? '¥' + course.price : '免费'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+            courseList.innerHTML += card;
+        });
+    }
+
+    // 4. 页面加载时自动执行
+    loadCourses();
+</script>
